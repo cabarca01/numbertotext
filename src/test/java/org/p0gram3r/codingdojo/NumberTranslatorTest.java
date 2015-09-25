@@ -6,57 +6,54 @@ import static org.junit.Assert.assertThat;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Test;
 
 public class NumberTranslatorTest {
 
     @Test
-    public void translateOnlyPositiveIntegers () {
-    	
-    	Integer number = 7;
-    	NumberTranslator numberTranslator = new NumberTranslator();
-    	String wordNumber = numberTranslator.translate(number);
-    	
-    	assertThat(wordNumber, is(equalTo("Seven")));
-    	
-    }
-    
-    @Test
     public void translateOutOfRange () {
     	
-    	List<Integer> numbers = Arrays.asList(0, -10, null);
+    	List<Long> testData = new ArrayList<>();
+    	testData.add(0L);
+    	testData.add(-10L);
+    	testData.add(5000000000000L);
+    	
     	NumberTranslator numberTranslator = new NumberTranslator();
-    	for (Integer number : numbers) {
-    		String wordNumber = numberTranslator.translate(number);
-    		assertThat(wordNumber, is(equalTo("Invalid Number")));
+    	for (Long number : testData) {
+    		String wordNumber = numberTranslator.translate(number.longValue());
+    		assertThat(wordNumber, is(equalTo("Out of range")));
        	}
     }
     
     @Test
-    public void translateGreaterThanTen () {
+    public void translateHappyCases () {
+    	Map<Long, String> testData = new HashMap<>();
+    	testData.put(7L, "Seven");
+    	testData.put(10L, "Ten");
+    	testData.put(19L, "Nineteen");
+    	testData.put(20L, "Twenty");
+    	testData.put(99L, "Ninety Nine");
+    	testData.put(100L, "One Hundred");
+    	testData.put(105L, "One Hundred and Five");
+    	testData.put(325L, "Three Hundred and Twenty Five");
+    	testData.put(999L, "Nine Hundred and Ninety Nine");
+    	testData.put(1000L, "One Thousand");
+    	testData.put(1005L, "One Thousand Five");
+    	testData.put(11345L, "Eleven Thousand Three Hundred and Forty Five");
+    	testData.put(999345L, "Nine Hundred and Ninety Nine Thousand Three Hundred and Forty Five");
+    	testData.put(2000000L, "Two Million");
+    	testData.put(5000000000L, "Five Billion");
     	
-       	List<Integer> numbers = Arrays.asList(10, 19, 20, 99);
-       	List<String> expectedWords = Arrays.asList("Ten", "Nineteen", "Twenty", "Ninety Nine");
     	NumberTranslator numberTranslator = new NumberTranslator();
-    	for (int i = 1; i < numbers.size(); i++) {
-    		String wordNumber = numberTranslator.translate(numbers.get(i));
-    		assertThat(wordNumber, is(equalTo(expectedWords.get(i))));
+    	for (Long number : testData.keySet()) {
+    		String wordNumber = numberTranslator.translate(number.longValue());
+    		assertThat(wordNumber, is(equalTo(testData.get(number))));
        	}
  	
     }
-    @Test
-    public void translateHundreds () {
-    	
-    	List<Integer> numbers = Arrays.asList(100, 105, 325, 999);
-       	List<String> expectedWords = Arrays.asList("One Hundread", "One Hundread and Five", 
-       			"Three Hundread and Twenty Five", "Nine Hundread and Ninety Nine");
-    	NumberTranslator numberTranslator = new NumberTranslator();
-    	for (int i = 1; i < numbers.size(); i++) {
-    		String wordNumber = numberTranslator.translate(numbers.get(i));
-    		assertThat(wordNumber, is(equalTo(expectedWords.get(i))));
-       	}
- 	
-    }
+    
 }

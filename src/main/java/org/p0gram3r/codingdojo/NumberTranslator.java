@@ -1,66 +1,91 @@
 package org.p0gram3r.codingdojo;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 public class NumberTranslator {
 	
-	private Map<Integer, String> units = new HashMap<>();
+	private Map<Integer, String> numbers = new HashMap<>();
 	private Map<Integer, String> tenths = new HashMap<>();
-	private Map<Integer, String> magnitudes = new HashMap<>();
+	private Map<Integer, String> prefix = new HashMap<>();
 	
 	public NumberTranslator() {
-		units.put(1, "One");
-		units.put(2, "Two");
-		units.put(3, "Three");
-		units.put(4, "Four");
-		units.put(5, "Five");
-		units.put(6, "Six");
-		units.put(7, "Seven");
-		units.put(8, "Eight");
-		units.put(9, "Nine");
-		units.put(10, "Ten");
-		units.put(11, "Eleven");
-		units.put(12, "Twelve");
-		units.put(13, "Thirteen");
-		units.put(14, "Fourteen");
-		units.put(15, "Fifteen");
-		units.put(16, "Sixteen");
-		units.put(17, "Seventeen");
-		units.put(18, "Eighteen");
-		units.put(19, "Nineteen");
+		numbers.put(1, "One");
+		numbers.put(2, "Two");
+		numbers.put(3, "Three");
+		numbers.put(4, "Four");
+		numbers.put(5, "Five");
+		numbers.put(6, "Six");
+		numbers.put(7, "Seven");
+		numbers.put(8, "Eight");
+		numbers.put(9, "Nine");
+		numbers.put(10, "Ten");
+		numbers.put(11, "Eleven");
+		numbers.put(12, "Twelve");
+		numbers.put(13, "Thirteen");
+		numbers.put(14, "Fourteen");
+		numbers.put(15, "Fifteen");
+		numbers.put(16, "Sixteen");
+		numbers.put(17, "Seventeen");
+		numbers.put(18, "Eighteen");
+		numbers.put(19, "Nineteen");
 		
 		tenths.put(2, "Twenty");
 		tenths.put(3, "Thirty");
-		tenths.put(4, "Fourty");
+		tenths.put(4, "Forty");
 		tenths.put(5, "Fifty");
 		tenths.put(6, "Sixty");
 		tenths.put(7, "Seventy");
 		tenths.put(8, "Eighty");
 		tenths.put(9, "Ninety");
 	
-		magnitudes.put(0, null);
-		magnitudes.put(1, null);
-		magnitudes.put(2, "Hundread and");
-		magnitudes.put(3, "Thousand");
-		magnitudes.put(4, "Million");
-		magnitudes.put(5, "Billion");
+		prefix.put(1, "Thousand");
+		prefix.put(2, "Million");
+		prefix.put(3, "Billion");
 	}
 	
-	public String translate(Integer number) {
-		if (number == null) {
-			return "Invalid Number";
-		}
-		String result = null;
+	public String translate(long number) {
+		 
+		ArrayList<Long> numberSplit = new ArrayList<>();
 		
-		if (number < 20) {
-			result = units.get(number);
-		} else {
-			int unit = number%10;
-			int tenth = number/10;
-			result = (unit > 0) ? tenths.get(tenth)+" "+units.get(unit) : tenths.get(tenth);				
+		while (number > 0) {
+			numberSplit.add(number%1000);
+			number /= 1000;
+			if (number < 1000) {
+				numberSplit.add(number);
+				number = 0;
+			}
 		}
-		return (result != null) ? result : "Invalid Number";
+		String result = "";
+		int prefixIdx = numberSplit.size() -1;
+		
+		if (!prefix.containsKey(prefixIdx)) {
+			return "Out of range";
+		}
+		
+		for (int idx = numberSplit.size()-1; idx >= 0 ; idx--) {
+			int part = numberSplit.get(idx).intValue();
+			if (part > 0) {
+				if ( part / 100 > 0) {
+					result += numbers.get(part/100);
+					result += ( part % 100 > 0) ? " Hundred and " : " Hundred ";
+				}
+				if ( part % 100 > 0) {
+					if ( numbers.containsKey(part%100) ) {
+						result += numbers.get(part%100);
+					} else {
+						result += tenths.get((part%100) / 10) + " ";
+						result += ((part%100) %10 > 0) ? numbers.get((part%100) % 10) : "";
+					}
+				}
+				if (prefix.containsKey(prefixIdx)) {
+					result += " "+prefix.get(prefixIdx) + " ";
+				}
+			}
+			prefixIdx -= 1;
+		}
+		return (result == "") ? "Out of range" : result.trim();
 	}
 
 }
